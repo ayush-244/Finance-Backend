@@ -23,6 +23,14 @@ exports.protect = async (req, res, next) => {
     // get user
     req.user = await User.findById(decoded.id).select("-password");
 
+    if (!req.user) {
+    return res.status(401).json({ message: "User not found" });
+    }
+
+    if (!req.user.isActive) {
+    return res.status(403).json({ message: "User is inactive" });
+    }
+
     next();
   } catch (error) {
     res.status(401).json({ message: "Token failed" });

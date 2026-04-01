@@ -36,3 +36,10 @@ app.get(
     res.json({ message: "Admin access granted ✅" });
   }
 );
+
+const recordRoutes = require("./routes/recordRoutes");
+
+app.use("/api/records", recordRoutes);
+
+const dashboardRoutes = require("./routes/dashboardRoutes");
+app.use("/api/dashboard", dashboardRoutes);

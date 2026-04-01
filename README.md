@@ -76,9 +76,9 @@ Three-tier authorization model:
 
 | Role | Permissions | Use Case |
 |------|-------------|----------|
-| **Viewer** | Read-only access to own records | Regular users monitoring finances |
-| **Analyst** | Create, read, update own records; view analytics | Users managing transactions and insights |
-| **Admin** | Full access to all user data and system operations | System administrators and operators |
+| **Viewer** | View dashboard analytics only | Regular users monitoring finances (read-only) |
+| **Analyst** | View records and access analytics | Users accessing insights and transaction data (read-only) |
+| **Admin** | Full access: create, read, update, delete all records | System administrators and operators |
 
 Implemented through composable middleware allowing fine-grained endpoint protection.
 
@@ -144,11 +144,11 @@ Implemented using MongoDB aggregation pipeline for efficient server-side computa
 
 | Method | Endpoint | Description | Auth Required | Role Required |
 |--------|----------|-------------|----------------|---------------|
-| GET | `/api/records` | Fetch user's records with pagination & filters | Yes | Viewer+ |
-| POST | `/api/records` | Create new financial record | Yes | Analyst+ |
-| GET | `/api/records/:id` | Get specific record details | Yes | Analyst+ |
-| PUT | `/api/records/:id` | Update record (ownership validated) | Yes | Analyst+ |
-| DELETE | `/api/records/:id` | Delete record (ownership validated) | Yes | Analyst+ |
+| GET | `/api/records` | Fetch user's records with pagination & filters | Yes | Analyst+ |
+| POST | `/api/records` | Create new financial record | Yes | Admin |
+| GET | `/api/records/:id` | Get specific record details | Yes | Admin |
+| PUT | `/api/records/:id` | Update record (ownership validated) | Yes | Admin |
+| DELETE | `/api/records/:id` | Delete record (ownership validated) | Yes | Admin |
 
 **Query Parameters for GET /api/records:**
 - `page=1` - Page number (default: 1)
@@ -162,7 +162,7 @@ Implemented using MongoDB aggregation pipeline for efficient server-side computa
 
 | Method | Endpoint | Description | Auth Required | Role Required |
 |--------|----------|-------------|----------------|---------------|
-| GET | `/api/dashboard/analytics` | Get comprehensive financial analytics | Yes | Analyst+ |
+| GET | `/api/dashboard/analytics` | Get comprehensive financial analytics | Yes | Any (protected) |
 
 ---
 
@@ -173,7 +173,7 @@ Implemented using MongoDB aggregation pipeline for efficient server-side computa
 Authorization is enforced at the middleware layer, allowing declarative endpoint protection:
 
 ```javascript
-router.post("/records", protect, authorizeRoles("analyst", "admin"), createRecord);
+router.post("/records", protect, authorizeRoles("admin"), createRecord);
 ```
 
 **Protection Flow:**
